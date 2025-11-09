@@ -1,0 +1,51 @@
+
+:root{
+  --fucsia:#c641f5;
+  --bg:#0f0f10;
+  --card:#1b1b1d;
+  --borde:rgba(198,65,245,.35);
+  --txt:#f2f2f2;
+  --primary: #ff2ebf;  /* botón rosado */
+  --secundary: #450532;/* botón morado */
+}
+html{
+  min-height:100%;
+  background:#0f0f10 url("../assets/img/fondo.jpg") repeat top left;
+}
+body{
+  min-height:100%;
+  background:transparent;
+  color:var(--txt);
+}
+.navbar{border-bottom:1px solid #222;}
+.card{background:var(--card);border:1px solid var(--borde);border-radius:1rem;}
+.card .btn{border-color:var(--fucsia);}
+.portada{width:100%;height:clamp(140px,22vw,200px);object-fit:cover;border-top-left-radius:1rem;border-top-right-radius:1rem;}
+.form-control.is-valid{border-color:#2ecc71}
+.form-control.is-invalid{border-color:#e74c3c}
+
+
+
+/* Botones rosados con letra blanca */
+.btn-primary{
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+.btn-primary:hover,
+.btn-primary:focus{
+  filter: brightness(0.95);
+  color: #fff;
+}
+
+/* Botones morado con letra blanca */
+.btn-secundary{
+  background: var(--secundary);
+  border-color: var(--secundary);
+  color: #fff;
+}
+.btn-secundary:hover,
+.btn-secundary:focus{
+  filter: brightness(0.95);
+  color: #fff;
+}
