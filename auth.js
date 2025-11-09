@@ -1,92 +1,172 @@
 
-function emailValido(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
-function passValida(v){ return v.length>=8 && /[A-Z]/.test(v) && /[0-9]/.test(v) && /[^A-Za-z0-9]/.test(v); }
+function emailValido(v){
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+}
+function passValida(v){
+  // mínimo 8, una mayúscula, un número y un símbolo
+  return v.length>=8 && /[A-Z]/.test(v) && /[0-9]/.test(v) && /[^A-Za-z0-9]/.test(v);
+}
+function getUsuarios(){
+  try { return JSON.parse(localStorage.getItem('usuarios') || '[]'); }
+  catch { return []; }
+}
+function setUsuarios(arr){
+  localStorage.setItem('usuarios', JSON.stringify(arr));
+}
 
-(function seed(){
+/* ===== 2 roles ===== */
+(function(){
   if(!localStorage.getItem('usuarios')){
-    const usuarios=[
+    setUsuarios([
       { email:'admin@pixelhoshi.com', password:'Admin*123',  rol:'admin'  },
       { email:'user@pixelhoshi.com',  password:'User*1234', rol:'usuario'}
-    ];
-    localStorage.setItem('usuarios', JSON.stringify(usuarios));
+    ]);
   }
 })();
-function getUsuarios(){ return JSON.parse(localStorage.getItem('usuarios')||'[]'); }
-function setUsuarios(a){ localStorage.setItem('usuarios', JSON.stringify(a)); }
 
+/* =========================================================
+   REGISTRO 
+   ========================================================= */
 (function(){
-  const f=document.getElementById('formRegistro'); if(!f) return;
-  f.addEventListener('submit', e=>{
-    e.preventDefault();
-    const email=document.getElementById('emailRegistro');
-    const p1=document.getElementById('passRegistro');
-    const p2=document.getElementById('passRegistro2');
-    let ok=true;
-    if(!emailValido(email.value)){ email.classList.add('is-invalid'); ok=false; } else { email.classList.remove('is-invalid'); email.classList.add('is-valid'); }
-    if(!passValida(p1.value))    { p1.classList.add('is-invalid');    ok=false; } else { p1.classList.remove('is-invalid');    p1.classList.add('is-valid'); }
-    if(p1.value!==p2.value||!p2.value){ p2.classList.add('is-invalid'); ok=false; } else { p2.classList.remove('is-invalid'); p2.classList.add('is-valid'); }
-    if(!ok) return;
+  function init(){
+    const btn  = document.getElementById('btnCrear');
+    const form = document.getElementById('formRegistro');
+    if(!btn || !form) return;
 
-    const usuarios=getUsuarios();
-    if(usuarios.some(u=>u.email.toLowerCase()===email.value.toLowerCase())){ alert('Ese email ya está registrado.'); return; }
-    usuarios.push({ email:email.value, password:p1.value, rol:'usuario' });
-    setUsuarios(usuarios);
-    alert('Cuenta creada. Ahora puedes ingresar.');
-    location.href='login.html';
-  });
+    const inpEmail = document.getElementById('emailRegistro');
+    const inpP1    = document.getElementById('passRegistro');
+    const inpP2    = document.getElementById('passRegistro2');
+
+    btn.addEventListener('click', function(){
+      // limpia marcas
+      [inpEmail, inpP1, inpP2].forEach(el => el.classList.remove('is-invalid','is-valid'));
+
+      let ok = true;
+      if(!emailValido(inpEmail.value)){ inpEmail.classList.add('is-invalid'); ok=false; } else { inpEmail.classList.add('is-valid'); }
+      if(!passValida(inpP1.value))    { inpP1.classList.add('is-invalid');    ok=false; } else { inpP1.classList.add('is-valid'); }
+      if(inpP1.value !== inpP2.value || !inpP2.value){ inpP2.classList.add('is-invalid'); ok=false; } else { inpP2.classList.add('is-valid'); }
+
+      if(!ok){ alert('Revisa los campos marcados en rojo.'); return; }
+
+      const usuarios = getUsuarios();
+      const existe = usuarios.some(u => u.email.toLowerCase() === inpEmail.value.toLowerCase());
+      if(existe){ alert('Ese email ya está registrado.'); return; }
+
+      usuarios.push({ email: inpEmail.value, password: inpP1.value, rol: 'usuario' });
+      setUsuarios(usuarios);
+      alert('Cuenta creada. Ahora puedes ingresar.');
+      location.href = 'login.html';
+    });
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
 })();
 
-(function(){
-  const f=document.getElementById('formLogin'); if(!f) return;
-  f.addEventListener('submit', e=>{
-    e.preventDefault();
-    const email=document.getElementById('emailLogin');
-    const pass=document.getElementById('passLogin');
-    let ok=true;
-    if(!emailValido(email.value)){ email.classList.add('is-invalid'); ok=false; } else { email.classList.remove('is-invalid'); }
-    if(!pass.value){ pass.classList.add('is-invalid'); ok=false; } else { pass.classList.remove('is-invalid'); }
-    if(!ok) return;
+/* =========================================================
+   LOGIN 
+   ========================================================= */
 
-    const usuarios=getUsuarios();
-    const u=usuarios.find(x=>x.email.toLowerCase()===email.value.toLowerCase());
-    if(u && u.password===pass.value){
-      localStorage.setItem('usuarioActual', u.email);
-      localStorage.setItem('rolActual', u.rol);
-      alert('Ingreso correcto');
-      location.href='catalogo.html';
-    } else {
-      alert('Credenciales incorrectas');
+(function(){
+  function init(){
+    const btn  = document.getElementById('btnIngresar');
+    const form = document.getElementById('formLogin');
+    if(!btn || !form) return;
+
+    const inpEmail = document.getElementById('emailLogin');
+    const inpPass  = document.getElementById('passLogin');
+
+    btn.addEventListener('click', function(){
+      // limpia
+      [inpEmail, inpPass].forEach(el => el.classList.remove('is-invalid','is-valid'));
+
+      let ok = true;
+      if(!emailValido(inpEmail.value)){ inpEmail.classList.add('is-invalid'); ok=false; } else { inpEmail.classList.add('is-valid'); }
+      if(!inpPass.value){ inpPass.classList.add('is-invalid'); ok=false; } else { inpPass.classList.add('is-valid'); }
+      if(!ok){ alert('Revisa los campos marcados en rojo.'); return; }
+
+      // lee usuarios
+      let usuarios = getUsuarios();
+      if(!Array.isArray(usuarios)){
+        localStorage.removeItem('usuarios');
+        usuarios = getUsuarios();
+      }
+
+      const u = usuarios.find(x => x.email.toLowerCase() === inpEmail.value.toLowerCase());
+      if(u && u.password === inpPass.value){
+        localStorage.setItem('usuarioActual', u.email);
+        localStorage.setItem('rolActual', u.rol);
+        alert('Ingreso correcto');
+        location.href = 'catalogo.html';
+      } else {
+        alert('Credenciales incorrectas');
+      }
+    });
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
+})();
+
+/* =========================================================
+   RECUPERAR 
+   ========================================================= */
+(function(){
+  const form = document.getElementById('formRecuperar');
+  if(!form) return;
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    const inpEmail = document.getElementById('emailRecuperar');
+    if(!emailValido(inpEmail.value)){
+      inpEmail.classList.add('is-invalid');
+      return;
     }
-  });
-})();
-
-(function(){
-  const f=document.getElementById('formRecuperar'); if(!f) return;
-  f.addEventListener('submit', e=>{
-    e.preventDefault();
-    const email=document.getElementById('emailRecuperar');
-    if(!emailValido(email.value)){ email.classList.add('is-invalid'); return; }
     alert('Enlace de recuperación enviado (simulado).');
-    email.classList.remove('is-invalid'); email.value='';
+    inpEmail.classList.remove('is-invalid');
+    inpEmail.value = '';
   });
 })();
 
+/* =========================================================
+   PERFIL (cambiar contraseña)
+   ========================================================= */
 (function(){
-  const f=document.getElementById('formPerfil'); if(!f) return;
-  const emailPerfil=document.getElementById('emailPerfil');
-  const conectado=localStorage.getItem('usuarioActual');
-  const rol=localStorage.getItem('rolActual');
-  emailPerfil.textContent = conectado ? `${conectado} (${rol||'sin rol'})` : 'No autenticado';
-  f.addEventListener('submit', e=>{
+  const form = document.getElementById('formPerfil');
+  if(!form) return;
+
+  const spanEmail = document.getElementById('emailPerfil');
+  const conectado = localStorage.getItem('usuarioActual');
+  const rol       = localStorage.getItem('rolActual');
+  spanEmail.textContent = conectado ? `${conectado} (${rol || 'sin rol'})` : 'No autenticado';
+
+  form.addEventListener('submit', function(e){
     e.preventDefault();
-    const nueva=document.getElementById('passNueva');
-    if(!passValida(nueva.value)){ nueva.classList.add('is-invalid'); return; }
-    const usuarios=getUsuarios();
-    const i=usuarios.findIndex(u=>u.email===conectado);
-    if(i===-1){ alert('No hay sesión activa.'); return; }
-    usuarios[i].password=nueva.value;
+    const inpNueva = document.getElementById('passNueva');
+    if(!passValida(inpNueva.value)){
+      inpNueva.classList.add('is-invalid');
+      return;
+    }
+    const usuarios = getUsuarios();
+    const idx = usuarios.findIndex(u => u.email === conectado);
+    if(idx === -1){ alert('No hay sesión activa.'); return; }
+    usuarios[idx].password = inpNueva.value;
     setUsuarios(usuarios);
-    nueva.classList.remove('is-invalid'); nueva.value='';
+    inpNueva.classList.remove('is-invalid');
+    inpNueva.value = '';
     alert('Contraseña actualizada.');
   });
+})();
+
+/* =========================================================
+   SALIR 
+   ========================================================= */
+(function(){
+  function initSalir(){
+    const link = document.getElementById('linkSalir');
+    if(!link) return;
+    link.addEventListener('click', function(e){
+      e.preventDefault();
+      localStorage.removeItem('usuarioActual');
+      localStorage.removeItem('rolActual');
+      alert('Sesión cerrada.');
+      location.href = 'login.html';
+    });
+  }
+  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', initSalir); } else { initSalir(); }
 })();
