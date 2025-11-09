@@ -7,7 +7,7 @@ const JUEGOS = [
 ];
 function estrellas(n){ const e=Math.round(n); return "⭐".repeat(e)+"☆".repeat(5-e); }
 function idDesdeQuery(){ const u=new URL(location.href); return parseInt(u.searchParams.get("id")); }
-
+//
 (function(){ const rejilla=document.getElementById('rejilla'); if(!rejilla) return;
   JUEGOS.forEach(j=>{
     const col=document.createElement('div'); col.className='col-12 col-sm-6 col-lg-4';
