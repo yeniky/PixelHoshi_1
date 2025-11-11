@@ -105,55 +105,6 @@ function setUsuarios(arr){
 })();
 
 /* =========================================================
-   RECUPERAR 
-   ========================================================= */
-(function(){
-  const form = document.getElementById('formRecuperar');
-  if(!form) return;
-  form.addEventListener('submit', function(e){
-    e.preventDefault();
-    const inpEmail = document.getElementById('emailRecuperar');
-    if(!emailValido(inpEmail.value)){
-      inpEmail.classList.add('is-invalid');
-      return;
-    }
-    alert('Enlace de recuperación enviado (simulado).');
-    inpEmail.classList.remove('is-invalid');
-    inpEmail.value = '';
-  });
-})();
-
-/* =========================================================
-   PERFIL (cambiar contraseña)
-   ========================================================= */
-(function(){
-  const form = document.getElementById('formPerfil');
-  if(!form) return;
-
-  const spanEmail = document.getElementById('emailPerfil');
-  const conectado = localStorage.getItem('usuarioActual');
-  const rol       = localStorage.getItem('rolActual');
-  spanEmail.textContent = conectado ? `${conectado} (${rol || 'sin rol'})` : 'No autenticado';
-
-  form.addEventListener('submit', function(e){
-    e.preventDefault();
-    const inpNueva = document.getElementById('passNueva');
-    if(!passValida(inpNueva.value)){
-      inpNueva.classList.add('is-invalid');
-      return;
-    }
-    const usuarios = getUsuarios();
-    const idx = usuarios.findIndex(u => u.email === conectado);
-    if(idx === -1){ alert('No hay sesión activa.'); return; }
-    usuarios[idx].password = inpNueva.value;
-    setUsuarios(usuarios);
-    inpNueva.classList.remove('is-invalid');
-    inpNueva.value = '';
-    alert('Contraseña actualizada.');
-  });
-})();
-
-/* =========================================================
    SALIR 
    ========================================================= */
 (function(){

@@ -1,4 +1,5 @@
 
+//
 const JUEGOS = [
   { id: 1, nombre: "Kena Bridge Of Spirits", genero: "Aventura", anio: 2021, portada: "assets/img/Kena.jpg", puntaje: 4.7 },
   { id: 2, nombre: "Final Fantasy XIV",      genero: "MMORPG",  anio: 2013, portada: "assets/img/Final_fantasy_xiv.jpg", puntaje: 4.6 },
@@ -6,9 +7,10 @@ const JUEGOS = [
   { id: 4, nombre: "Spyro Reignited Trilogy", genero: "Aventura", anio: 2018, portada: "assets/img/Spyro.jpg", puntaje: 4.8 }
 ];
 function estrellas(n){ const e=Math.round(n); return "⭐".repeat(e)+"☆".repeat(5-e); }
-function idDesdeQuery(){ const u=new URL(location.href); return parseInt(u.searchParams.get("id")); }
-//
+function idDesdeQuery(){ const u=new URL(location.href); return parseInt(u.searchParams.get("id")); }//
+
 (function(){ const rejilla=document.getElementById('rejilla'); if(!rejilla) return;
+ //
   JUEGOS.forEach(j=>{
     const col=document.createElement('div'); col.className='col-12 col-sm-6 col-lg-4';
     col.innerHTML=`<div class="card h-100">
@@ -17,15 +19,15 @@ function idDesdeQuery(){ const u=new URL(location.href); return parseInt(u.searc
         <h5 class="card-title text-white ">${j.nombre}</h5>
         <p class="text-white mb-1">${j.genero} • ${j.anio}</p>
         <p class="mb-2 text-white ">Rating comunidad: <strong>${j.puntaje.toFixed(1)}</strong> ${estrellas(j.puntaje)}</p>
-        <a class="btn btn-outline-primary w-100" href="game.html?id=${j.id}">Ver detalle</a>
-      </div></div>`;
+        <a class="btn btn-outline-primary w-100" href="game.html?id=${j.id}">Ver detalle</a> 
+      </div></div>`; //
     rejilla.appendChild(col);
   });
 })();
 
 (function(){ const cab=document.getElementById('cabecera'); if(!cab) return;
   const lista=document.getElementById('lista');
-  const id=idDesdeQuery(); const juego=JUEGOS.find(j=>j.id===id);
+  const id=idDesdeQuery(); const juego=JUEGOS.find(j=>j.id===id); //
   if(!juego){ cab.innerHTML='<div class="alert alert-danger">Juego no encontrado.</div>'; return; }
 
   cab.innerHTML=`<div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3">
@@ -34,11 +36,11 @@ function idDesdeQuery(){ const u=new URL(location.href); return parseInt(u.searc
       <p class="text-white   m-0">${juego.genero} • ${juego.anio}</p>
       <p class="m-0">Rating comunidad: <strong>${juego.puntaje.toFixed(1)}</strong> ${estrellas(juego.puntaje)}</p>
     </div></div>`;
-
+//Reseñas
   const clave=`resenas_${id}`; const resenas=JSON.parse(localStorage.getItem(clave)||"[]");
   const rolActual=localStorage.getItem('rolActual'); // 'admin' o 'usuario'
 
-  function dibujar(){ lista.innerHTML=''; resenas.forEach((r,i)=>{
+  function dibujar(){ lista.innerHTML=''; resenas.forEach((r,i)=>{ //
       const div=document.createElement('div'); div.className='border rounded p-3';
       div.innerHTML=`<div class="d-flex justify-content-between align-items-center mb-1">
         <strong>${r.usuario||'Anónimo'}</strong>
@@ -52,7 +54,7 @@ function idDesdeQuery(){ const u=new URL(location.href); return parseInt(u.searc
     document.getElementById('contador').textContent=resenas.length; }
   dibujar();
 //Eliminar-Ocultar
-  lista.addEventListener('click', e=>{
+  lista.addEventListener('click', e=>{ //
     const b=e.target.closest('button'); if(!b) return;
     const i=parseInt(b.dataset.i,10); const a=b.dataset.action;
     if(a==='del'){ resenas.splice(i,1); }

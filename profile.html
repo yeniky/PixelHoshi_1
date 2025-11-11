@@ -50,52 +50,43 @@
 <script src="js/auth.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  // 1) Mostrar el email (y el rol) en el encabezado
   const span = document.getElementById('emailPerfil');
   const correo = localStorage.getItem('usuarioActual') || '';
   const rol    = localStorage.getItem('rolActual')   || '';
   span.textContent = correo ? `${correo} (${rol || 'sin rol'})` : 'No autenticado';
-
-  // 2) Validador sencillo de contraseña (mismo criterio que usas en auth.js)
   function passValida(v){
     return v.length >= 8 && /[A-Z]/.test(v) && /\d/.test(v) && /[^A-Za-z0-9]/.test(v);
   }
-
-  // 3) Guardar nueva contraseña en localStorage
   const form = document.getElementById('formPerfil');
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const nueva = document.getElementById('passNueva');
 
     if (!correo) {
-      alert('No hay sesión activa en esta ruta. Inicia sesión y vuelve.');
+      alert('No hay sesión activa. Inicia sesión y vuelva.');
       return;
     }
     if (!passValida(nueva.value)) {
       nueva.classList.add('is-invalid');
       return;
     }
-
     let usuarios = [];
     try { usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]'); }
     catch { usuarios = []; }
-
     const correoN = correo.toLowerCase();
     const idx = usuarios.findIndex(u => (u.email || '').toLowerCase() === correoN);
     if (idx === -1) {
-      alert('No encontré tu usuario en esta ruta. Inicia sesión aquí mismo.');
+      alert('No se encontro el usuario. Inicia sesión aquí mismo.');
       return;
     }
-
     usuarios[idx].password = nueva.value;
     localStorage.setItem('usuarios', JSON.stringify(usuarios));
     nueva.classList.remove('is-invalid');
-    nueva.value = '';
+    nueva.  value = '';
     alert('Contraseña actualizada.');
   });
 });
 </script>
-
 <script>
   (function(){
     const btn = document.getElementById('linkSalir');
