@@ -51,7 +51,7 @@ function idDesdeQuery(){ const u=new URL(location.href); return parseInt(u.searc
       lista.appendChild(div); });
     document.getElementById('contador').textContent=resenas.length; }
   dibujar();
-
+//Eliminar-Ocultar
   lista.addEventListener('click', e=>{
     const b=e.target.closest('button'); if(!b) return;
     const i=parseInt(b.dataset.i,10); const a=b.dataset.action;
