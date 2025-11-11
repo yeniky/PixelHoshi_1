@@ -7,7 +7,6 @@
 </head>
 <body>
 
-
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom">
   <div class="container">
     <a class="navbar-brand fw-bold" href="index.html">
@@ -24,7 +23,6 @@
         <li class="nav-item"><a class="nav-link" href="register.html">Registrarse</a></li>
         <li class="nav-item"><a class="nav-link" href="profile.html">Perfil</a></li>
         <li class="nav-item"><a class="nav-link" href="#" id="linkSalir">Salir</a></li>
-
       </ul>
     </div>
   </div>
@@ -35,6 +33,7 @@
   <div class="card mb-4"><div class="card-body">
     <p class="m-0 text-white">Usuario: <strong id="emailPerfil">-</strong></p>
   </div></div>
+
   <h2 class="h5">Cambiar contraseña</h2>
   <form id="formPerfil" novalidate class="needs-validation">
     <div class="mb-3">
@@ -43,50 +42,63 @@
       <small class="text-white">Mín. 8, 1 mayúscula, 1 número, 1 símbolo.</small>
       <div class="invalid-feedback">La contraseña no cumple las reglas.</div>
     </div>
-    <button class="btn btn-primary">Guardar cambios</button>
+    <button type="submit" class="btn btn-primary">Guardar cambios</button>
   </form>
 </main>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="js/auth.js"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const span = document.getElementById('emailPerfil');
-  const correo = localStorage.getItem('usuarioActual') || '';
-  const rol    = localStorage.getItem('rolActual')   || '';
-  span.textContent = correo ? `${correo} (${rol || 'sin rol'})` : 'No autenticado';
+  const correoActual = (localStorage.getItem('usuarioActual') || '').trim();
+  const rolActual    = (localStorage.getItem('rolActual') || '').trim();
+  span.textContent = correoActual ? `${correoActual} (${rolActual || 'sin rol'})` : 'No autenticado';
+
   function passValida(v){
     return v.length >= 8 && /[A-Z]/.test(v) && /\d/.test(v) && /[^A-Za-z0-9]/.test(v);
   }
+
   const form = document.getElementById('formPerfil');
+  if (!form) return;
+
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const nueva = document.getElementById('passNueva');
-
+    const correo = (localStorage.getItem('usuarioActual') || '').trim();
     if (!correo) {
-      alert('No hay sesión activa. Inicia sesión y vuelva.');
+      alert('No hay sesión activa. Inicia sesión y vuelve.');
       return;
     }
     if (!passValida(nueva.value)) {
       nueva.classList.add('is-invalid');
       return;
     }
+    nueva.classList.remove('is-invalid');
     let usuarios = [];
     try { usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]'); }
     catch { usuarios = []; }
-    const correoN = correo.toLowerCase();
-    const idx = usuarios.findIndex(u => (u.email || '').toLowerCase() === correoN);
+
+    const idx = usuarios.findIndex(u => (u.email || '').toLowerCase() === correo.toLowerCase());
     if (idx === -1) {
-      alert('No se encontro el usuario. Inicia sesión aquí mismo.');
+      alert('No se encontró el usuario en esta ruta. Inicia sesión aquí mismo.');
       return;
     }
+
     usuarios[idx].password = nueva.value;
     localStorage.setItem('usuarios', JSON.stringify(usuarios));
-    nueva.classList.remove('is-invalid');
-    nueva.  value = '';
-    alert('Contraseña actualizada.');
+    nueva.value = '';
+    alert('Contraseña actualizada. Por seguridad, volverás a iniciar sesión.');
+
+    // Cierra sesión
+    localStorage.removeItem('usuarioActual');
+    localStorage.removeItem('rolActual');
+    window.location.replace('login.html');
   });
 });
 </script>
+
 <script>
   (function(){
     const btn = document.getElementById('linkSalir');
